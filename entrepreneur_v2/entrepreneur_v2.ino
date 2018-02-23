@@ -1,3 +1,7 @@
+/*************************************
+* My Lidar Lite を扱うためのプログラム
+*************************************/
+
 //#include <SoftwareServo.h>
 //#include <TimerOne.h>
 #include <MsTimer2.h>
@@ -79,4 +83,8 @@ void tick()//タイマで割り込む
     }
     roundCount = 0;
   }
+}
+
+void noneAction() {
+ //何の働きもない関数です。 
 }
