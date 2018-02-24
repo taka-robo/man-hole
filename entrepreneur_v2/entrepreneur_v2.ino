@@ -43,7 +43,7 @@ void setup() {
 }
 
 void loop() {
-  receive(false);
+  receive(true);
 }
 
 void receive(bool bias)
@@ -52,12 +52,12 @@ void receive(bool bias)
   // float azimuth = (((float)stepCount / 200.0f) * 360.0f);
   float azimuth = 1.8 * stepCount * deg2rad;
   float elevation = (90 - height) * deg2rad;
-  float radius = myLidarLite.distance(1);//極座標系(距離)
+  float radius = myLidarLite.distance(bias);//極座標系(距離) trueじゃないと距離が取れない
   //極座標を直行座標に変換
   float y = radius * sin(elevation ) * cos(azimuth );
   float x = radius * sin(elevation ) * sin(azimuth );
   float z = radius * cos(elevation );
-  Serial.println(String(-x, 5) + " " + String(-y, 5) + " " + String(z, 5));
+  Serial.println(String(-x, 5) + " " + String(-y, 5) + " " + String(z, 5)/* + " " + String(height)*/);
   servo.write(height);
 }
 
