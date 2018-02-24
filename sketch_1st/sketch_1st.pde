@@ -11,7 +11,7 @@
 import processing.serial.*;
 
 Serial serial;
-int serialPortNumber = 0;
+int serialPortNumber = 2;//<== Change COM Number Yourself
 float angle = 6.5f;
 float angleIncrement = 0;
 float xOffset = 3.0;
