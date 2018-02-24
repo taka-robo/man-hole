@@ -20,38 +20,63 @@ float yOffset = 152.0f;
 float yOffsetIncrement = 0;
 float scale = 2.6f;
 float scaleIncrement = 0;
-ArrayList<PVector> vectors;
+//ArrayList<PVector> vectors;
 int lastPointIndex = 0;
 int lastPointCount = 0;
+
+int MAX_ROW = 10000;
+int MAX_COLUM = 3;
+String[] mapForDraw;
+float[][] dotData = new float[MAX_ROW][MAX_COLUM];
 
 void setup() {
   size(800, 600, P3D);
   colorMode(RGB, 255, 255, 255);
   noSmooth();
-  vectors = new ArrayList<PVector>();
-  String[] serialPorts = Serial.list();
+  
+  mapForDraw = loadStrings("mapTest01.csv");
+  //vectors = new ArrayList<PVector>();
+  
+  // If the File could be opned
+  if(mapForDraw != null) {
+    for(int i = 0; i < mapForDraw.length; i++) {
+      // Check If It Is Not Brank
+      if(mapForDraw[i].length() != 0) {
+        // Separate by ",".
+        String[] values = split(mapForDraw[i], ',');
+        // Read As Many Columns
+        for(int j = 0; j < 3; j++) {
+          if(values[j] != null && values[j].length() != 0) {
+            dotData[i][j] = float(values[j]);
+          }
+        }
+      }
+    }
+  }
+  
+  /*String[] serialPorts = Serial.list();
   String serialPort = serialPorts[serialPortNumber];
   println("Using serial port \"" + serialPort + "\"");
   println("To use a different serial port, change serialPortNumber:");
   printArray(serialPorts);
-  serial = new Serial(this, serialPort, 115200);
+  serial = new Serial(this, serialPort, 115200);*/
 }
 
 void draw() {
-  String input = serial.readStringUntil(10);
+  /*String input = mapForDraw.readStringUntil(10); //Read Until "10" means "\n" comes.
   if (input != null) {
-    String[] components = split(input, ' ');
+    String[] components = split(input, ','); // Separate by ",".
     if (components.length == 3) {
       vectors.add(new PVector(float(components[0]), float(components[1]), float(components[2])));
     }
-  }
-  background(0);
+  }*/
+  
+  background(0); //Back Ground Color Is Black.
   translate(width/2, height/2, -50);
   rotateY(angle);
-  int size = vectors.size();
-  for (int index = 0; index < size; index++) {
-    PVector v = vectors.get(index);
-    if (index == size - 1) {
+  for (int index = 0; index < mapForDraw.length; index++) {
+    //PVector v = vectors.get(index);
+    /*if (index == size - 1) {
       // draw red line to show recently added LIDAR scan point
       if (index == lastPointIndex) {
         lastPointCount++;
@@ -63,9 +88,9 @@ void draw() {
         stroke(255, 0, 0);
         line(xOffset, yOffset, 0, v.x * scale + xOffset, -v.z * scale + yOffset, -v.y * scale);
       }
-    }
+    }*/
     stroke(255, 255, 255);
-    point(v.x * scale + xOffset, -v.z * scale + yOffset, -v.y * scale);
+    point(dotData[index][0] * scale + xOffset, -dotData[index][2] * scale + yOffset, -dotData[index][1] * scale);// [Attention!!]X, Z, Y
   }
   angle += angleIncrement;
   xOffset += xOffsetIncrement;
@@ -94,7 +119,7 @@ void keyPressed() {
     yOffsetIncrement = 1f;
   } else if (key =='x') {
     // erase all points
-    vectors.clear();
+    //dotMap.clear();
   } else if (key == CODED) {
     if (keyCode == LEFT) {
       // rotate left
