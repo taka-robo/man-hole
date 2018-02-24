@@ -20,6 +20,7 @@ volatile int stepCount = 0;
 volatile int roundCount = 0;
 
 int height = 0;
+int numCount = 0;
 
 void setup() {
   Serial.begin(115200);
@@ -44,6 +45,7 @@ void setup() {
 
 void loop() {
   receive(true);
+  numCount++;
 }
 
 void receive(bool bias)
@@ -53,20 +55,22 @@ void receive(bool bias)
   float azimuth = 1.8 * stepCount * deg2rad;
   float elevation = (90 - height) * deg2rad;
   float radius = myLidarLite.distance(bias);//極座標系(距離) trueじゃないと距離が取れない
+  //Serial.println( String(height) + " " +  String(azimuth) + " " + String(elevation));
   //極座標を直行座標に変換
   float y = radius * sin(elevation ) * cos(azimuth );
   float x = radius * sin(elevation ) * sin(azimuth );
   float z = radius * cos(elevation );
-  Serial.println(String(-x, 5) + " " + String(-y, 5) + " " + String(z, 5)/* + " " + String(height)*/);
+  //X,Y,Z , height, stepCount, roundCount, numCount
+  Serial.println(String(-x, 5) + " " + String(-y, 5) + " " + String(z, 5)/* + " " + String(height) + " " + String(stepCount) + " " + String(roundCount) + " " + numCount */);
   servo.write(height);
 }
 
 
 void tick()//タイマで割り込む
 {
-  digitalWrite(STEP_PIN, HIGH);
+  //digitalWrite(STEP_PIN, HIGH);
   delay(1);
-  digitalWrite(STEP_PIN, LOW);
+  //digitalWrite(STEP_PIN, LOW);
 
   stepCount++;
   if (stepCount >= 200)

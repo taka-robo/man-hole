@@ -41,7 +41,8 @@ void draw() {
   String input = serial.readStringUntil(10);
   if (input != null) {
     String[] components = split(input, ' ');
-    if (components.length == 3) {
+    if (components.length == 3) 
+    {
       vectors.add(new PVector(float(components[0]), float(components[1]), float(components[2])));
     }
   }
