@@ -24,7 +24,7 @@ float scaleIncrement = 0;
 int lastPointIndex = 0;
 int lastPointCount = 0;
 
-int MAX_ROW = 10000;
+int MAX_ROW = 1000000;
 int MAX_COLUM = 3;
 String[] mapForDraw;
 float[][] dotData = new float[MAX_ROW][MAX_COLUM];
@@ -34,7 +34,7 @@ void setup() {
   colorMode(RGB, 255, 255, 255);
   noSmooth();
   
-  mapForDraw = loadStrings("mapTest01.csv");
+  mapForDraw = loadStrings("myRoom2.csv");
   //vectors = new ArrayList<PVector>();
   
   // If the File could be opned
