@@ -92,9 +92,9 @@ void keyPressed() {
   } else if (key == 's') {
     // move down
     yOffsetIncrement = 1f;
-  } else if (key =='x') {
+  } else if (key =='x'&& key =='h') {
     // erase all points
-    vectors.clear();
+   // vectors.clear();
   } else if (key == CODED) {
     if (keyCode == LEFT) {
       // rotate left
