@@ -78,7 +78,7 @@ void tick()//タイマで割り込む
   if (roundCount >= 2) //二週したら0に戻す
   {
     height = height + 1;//サーボの角度をプラス
-    if (height >= 91)  { //サーボが90度までいったら0に戻す
+    if (height >= 31)  { //サーボが90度までいったら0に戻す
       height = 0;
     }
     roundCount = 0;

@@ -28,13 +28,14 @@ int MAX_ROW = 1000000;
 int MAX_COLUM = 3;
 String[] mapForDraw;
 float[][] dotData = new float[MAX_ROW][MAX_COLUM];
+float distanceFromTheOrigin = 0;
 
 void setup() {
   size(800, 600, P3D);
   colorMode(RGB, 255, 255, 255);
   noSmooth();
-  
-  mapForDraw = loadStrings("myRoom2.csv");
+
+  mapForDraw = loadStrings("myLabo_5_03_25_21_14.csv");
   //vectors = new ArrayList<PVector>();
   
   // If the File could be opned
@@ -53,13 +54,20 @@ void setup() {
       }
     }
   }
-  
   /*String[] serialPorts = Serial.list();
   String serialPort = serialPorts[serialPortNumber];
   println("Using serial port \"" + serialPort + "\"");
   println("To use a different serial port, change serialPortNumber:");
   printArray(serialPorts);
   serial = new Serial(this, serialPort, 115200);*/
+}
+
+void calculateTheDiameter() {
+  for (int index = 0; index < mapForDraw.length; index++) {
+  }
+  fill(255,255,255);
+  textSize(20);
+  text("Diameter",10,30);
 }
 
 void draw() {
@@ -70,8 +78,8 @@ void draw() {
       vectors.add(new PVector(float(components[0]), float(components[1]), float(components[2])));
     }
   }*/
-  
   background(0); //Back Ground Color Is Black.
+  calculateTheDiameter();
   translate(width/2, height/2, -50);
   rotateY(angle);
   for (int index = 0; index < mapForDraw.length; index++) {
@@ -90,6 +98,18 @@ void draw() {
       }
     }*/
     stroke(255, 255, 255);
+    distanceFromTheOrigin = mag(dotData[index][0],dotData[index][1],dotData[index][2]);
+    if(distanceFromTheOrigin < 10) {
+      stroke(color(255,0,0));//R
+    }else if(distanceFromTheOrigin > 10 && distanceFromTheOrigin < 15){
+      stroke(color(255,255,0));//R + G
+    }else if(distanceFromTheOrigin > 15 && distanceFromTheOrigin < 20){
+      stroke(color(0,255,0));//G
+    }else if(distanceFromTheOrigin > 20 && distanceFromTheOrigin < 25){
+      stroke(color(0,0,255));//B
+    }else if(distanceFromTheOrigin > 25){
+      stroke(color(255,0,255));//R + B
+    }
     point(dotData[index][0] * scale + xOffset, -dotData[index][2] * scale + yOffset, -dotData[index][1] * scale);// [Attention!!]X, Z, Y
   }
   angle += angleIncrement;
