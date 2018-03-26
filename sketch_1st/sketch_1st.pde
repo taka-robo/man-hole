@@ -29,6 +29,9 @@ int MAX_COLUM = 3;
 String[] mapForDraw;
 float[][] dotData = new float[MAX_ROW][MAX_COLUM];
 float distanceFromTheOrigin = 0;
+float averageDiameter = 0;
+float BIAS_MIN = 0.8;
+float BIAS_MAX = 1.2;
 
 void setup() {
   size(800, 600, P3D);
@@ -63,11 +66,25 @@ void setup() {
 }
 
 void calculateTheDiameter() {
-  for (int index = 0; index < mapForDraw.length; index++) {
+  int index,countValid = 0;
+  float distance = 0,ave = 0,ave2 = 0;
+  for (index = 0; index < mapForDraw.length; index++) {
+    ave += mag(dotData[index][0],dotData[index][1],dotData[index][2]);
   }
+  ave /= index;//Compute Average of Diameter
+  for (index = 0; index < mapForDraw.length; index++) {
+    distance = mag(dotData[index][0],dotData[index][1],dotData[index][2]);
+    //Carefully Select The Values, And Compute A New Average.
+    if(distance > (ave * BIAS_MIN) && distance < (ave * BIAS_MAX)){
+      ave2 += distance;
+      countValid ++;
+    }
+  }
+  ave2 /= countValid;
   fill(255,255,255);
   textSize(20);
-  text("Diameter",10,30);
+  text("Average Of Old Diameter Is : " + ave ,10,30);
+  text("Average Of New Diameter Is : " + ave2,10,60);
 }
 
 void draw() {
