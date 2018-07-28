@@ -19,7 +19,7 @@ volatile int stepCount = 0;
 volatile int roundCount = 0;
 
 void setup() {
-  Serial.begin(115200);
+  Serial.begin(9600);
   Serial.println("setup");
   /*ToF set up*/
   if (!ToF.begin()) {
