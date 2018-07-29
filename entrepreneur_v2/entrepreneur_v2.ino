@@ -1,9 +1,3 @@
-/*************************************
-* My Lidar Lite を扱うためのプログラム
-*************************************/
-#include <stdio.h>
-#include <TimerOne.h>
-#include <MsTimer2.h>
 #include <Wire.h>
 #include <LIDARLite.h>
 #include "Adafruit_VL53L0X.h"
