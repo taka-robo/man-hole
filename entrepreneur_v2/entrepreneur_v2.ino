@@ -1,5 +1,7 @@
 #include <Wire.h>
+#include <MsTimer2.h>
 #include <LIDARLite.h>
+#include <LiquidCrystal.h>
 #include "Adafruit_VL53L0X.h"
 #define pi 3.14159265
 #define DIR_PIN 2
@@ -8,7 +10,7 @@
 
 LIDARLite myLidarLite;
 Adafruit_VL53L0X ToF = Adafruit_VL53L0X();
-
+LiquidCrystal lcd()
 volatile int stepCount = 0;
 volatile int roundCount = 0;
 
@@ -77,7 +79,6 @@ void tick()//タイマで割り込む
     stepCount = 0;
     roundCount++;
   }
-  //printf("step=%d,rad=%d\n",stepCount,radius);
   Serial.print(stepCount);
   Serial.print(",");
   Serial.println(radius);
