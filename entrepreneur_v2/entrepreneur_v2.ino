@@ -10,7 +10,7 @@
 
 LIDARLite myLidarLite;
 Adafruit_VL53L0X ToF = Adafruit_VL53L0X();
-LiquidCrystal lcd()
+LiquidCrystal lcd();
 volatile int stepCount = 0;
 volatile int roundCount = 0;
 
@@ -19,8 +19,7 @@ void setup() {
   Serial.println("setup");
   /*ToF set up*/
   if (!ToF.begin()) {
-    Serial.println(F("Failed to boot VL53L0X"));
-    while(1);
+    Serial.println("Failed to boot VL53L0X");
   }else{
       Serial.println("ToF ready");
   }
