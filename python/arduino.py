@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import serial.tools.list_ports
 from matplotlib.widgets import Button
-pc = serial.Serial("COM3") #接続場所は適宜変える
-pc.baudrate = 9600
+pc = serial.Serial("COM3") #接続場所は適宜変える#windows version
+pc.baudrate = 115200
 fig, ax = plt.subplots()
 ax.set_xlabel("x[mm]")
 ax.set_ylabel("y[mm]")
