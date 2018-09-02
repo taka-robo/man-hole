@@ -15,7 +15,7 @@ volatile int stepCount = 0;
 volatile int roundCount = 0;
 
 void setup() {
-  Serial.begin(9600);
+  Serial.begin(115200);
   Serial.println("setup");
   /*ToF set up*/
   if (!ToF.begin()) {
@@ -51,26 +51,13 @@ int receive()
     return rad_from_ToF;
   }
 }
-int stepUp(){
-  digitalWrite(STEP_PIN, HIGH);
-  delay(1);
-  digitalWrite(STEP_PIN, LOW);
-  stepCount++;
-  if (stepCount >= 200)
-  {
-    stepCount = 0;
-    roundCount++;
-  }
-  return stepCount;
-}
-
 void tick()//タイマで割り込む
 {
   interrupts();
   int radius = receive();
   noInterrupts();
   digitalWrite(STEP_PIN, HIGH);
-  delay(1);
+  delay(10);
   digitalWrite(STEP_PIN, LOW);
   stepCount++;
   if (stepCount >= 200)
