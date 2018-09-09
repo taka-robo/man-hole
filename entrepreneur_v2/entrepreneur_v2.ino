@@ -64,10 +64,14 @@ void tick()//タイマで割り込む
   {
     stepCount = 0;
     roundCount++;
+    if(roundCount==2){
+      MsTimer2::stop();
+    }
   }
   Serial.print(stepCount);
   Serial.print(",");
   Serial.println(radius);
+  
 }
 void noneAction() {
  //何の働きもない関数です。 
