@@ -181,18 +181,22 @@ int LSM(float *x, float *y)
   r = sqrt(a*a+b*b-ansmat.data[2][0]);
   lcd.clear();
   lcd.print(r);
+  lcd.print("mm");
+  Serial.println(r);
   return EXIT_SUCCESS;
 }
 void setup() {
   Serial.begin(115200);
   Serial.println("setup");
+  lcd.print("setup"); 
   /*ToF set up*/
   if (!ToF.begin()) {
     Serial.println("Failed to boot VL53L0X");
+    while(1);
   } else {
     Serial.println("ToF ready");
   }
-  lcd.print("test"); 
+
   /*Lidar set up*/
   myLidarLite.begin(0, true);
   myLidarLite.configure(0);
@@ -208,7 +212,7 @@ void setup() {
   pinMode(DIR_PIN, OUTPUT);
   pinMode(STEP_PIN, OUTPUT);
   /*timer attch set up*/
-  MsTimer2::set(250, tick);/*[ms]*/
+  MsTimer2::set(50, tick);/*[ms]*/
 }
 
 void loop() {
@@ -231,7 +235,7 @@ void loop() {
     digitalWrite(CCW_PIN,LOW); 
     digitalWrite(PWM_PIN,LOW);
   } 
-  if (goState != 1){
+  if ((goState != 1)&&(flag2==0)){
       Serial.println("GO");
       MsTimer2::start();
       flag2 = 1;
@@ -246,29 +250,32 @@ int receive()
 {
   VL53L0X_RangingMeasurementData_t measure;
   ToF.rangingTest(&measure, false); // pass in 'true' to get debug data printout
-  int rad_from_lidar = myLidarLite.distance(1);/*[mm]*/
-  int rad_from_ToF   = measure.RangeMilliMeter;/*[mm]*/
+  int rad_from_lidar_mm = myLidarLite.distance(1)*10;/*[cm]*/
+  int rad_from_ToF_mm   = measure.RangeMilliMeter;/*[mm]*/
+  //Serial.println(rad_from_lidar_mm);
+  //Serial.println(rad_from_ToF_mm);
   /*暫定的にlidarが1000mm以下の場合ToFの値をリターン*/
-  if (rad_from_lidar > 1000) {
-    return rad_from_lidar;
+  if (rad_from_lidar_mm > 2000) {
+    return rad_from_lidar_mm;
   } else {
-    return rad_from_ToF;
+    return rad_from_ToF_mm;
   }
 }
 void tick()//タイマで割り込む
 {
+  lcd.clear();
+  lcd.print("measuring");
   static int stepCount = 0;
   interrupts();
   int radius = receive();
   noInterrupts();
-  Serial.println(radius);
   x[stepCount] = radius*cos(stepCount*DEG2RAD);
   y[stepCount] = radius*sin(stepCount*DEG2RAD);
-  /*Serial.print(stepCount);
+  Serial.print(stepCount);
   Serial.print(",");
   Serial.print(x[stepCount]);
   Serial.print(",");
-  Serial.println(y[stepCount]);*/
+  Serial.println(y[stepCount]);
   digitalWrite(STEP_PIN, HIGH);
   delay(10);
   digitalWrite(STEP_PIN, LOW);
