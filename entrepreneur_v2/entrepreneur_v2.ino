@@ -1,4 +1,3 @@
-/*hogehoge*/
 #include <Wire.h>
 #include <MsTimer2.h>
 #include <LIDARLite.h>
@@ -8,13 +7,13 @@
 #define DIR_PIN 2
 #define STEP_PIN 3
 #define DEG2RAD pi/180.0
-#define NOS 50 //number of smaple
+#define NOS 400 //number of sample
 float x[NOS];
 float y[NOS];
-bool flag = 0;
+bool flag =01;
 LIDARLite myLidarLite;
 Adafruit_VL53L0X ToF = Adafruit_VL53L0X();
-LiquidCrystal lcd();
+LiquidCrystal lcd(12,11,10,7,6,5,4);
 //構造体で行列を定義
 typedef struct matrix {
   int m;//行数
@@ -140,9 +139,8 @@ float sum_xy(float *x, float *y) {
 }
 int LSM(float *x, float *y)
 {
-  Serial.println("LSM");
   int i, j, k;
-  float sumx = sum(x), sumy = sum(y), sumx2 = sum2(x), sumy2 = sum2(y), sumxy = sum_xy(x,y);
+  float sumx = sum(x), sumy = sum(y), sumx2 = sum2(x), sumy2 = sum2(y), sumxy = sum_xy(x,y),a,b,r;
   matrix rightmat, leftmat, ansmat,inversemat;
   makeMatrix(3, 3, &rightmat);
   makeMatrix(3, 3, &inversemat);
@@ -157,24 +155,22 @@ int LSM(float *x, float *y)
   for (i = 0; i < 3; i++) {
     ansmat.data[i][0] = 0;
   }
-  Serial.println("aa");
+  //printMatrix(&leftmat);
   for (i = 0; i < NOS; i++) {
-    leftmat.data[0][0] = ((x[i] * x[i] * x[i]) - (x[i] * y[i] * y[i]));
-    leftmat.data[1][0] = ((x[i] * x[i] * y[i]) - (y[i] * y[i] * y[i]));
-    leftmat.data[2][0] = ((x[i] * x[i]) - (y[i] * y[i]));
-  }Serial.println("b");
+    leftmat.data[0][0] += pow(x[i],3) + (x[i] * y[i] * y[i]);
+    leftmat.data[1][0] += (x[i] * x[i] * y[i]) + pow(y[i],3);
+    leftmat.data[2][0] += ((x[i] * x[i]) + (y[i] * y[i]));
+  }
   for (i = 0; i < 3; i++) {
     leftmat.data[i][0] = leftmat.data[i][0]*-1;
   }
-  Serial.println("ccc");
-  printMatrix(&rightmat);
-  printMatrix(&leftmat);
-  Serial.println("dd");
   inverse(&rightmat, &inversemat);
-  Serial.println("ee");
   matrixmultiply(&inversemat, &leftmat, &ansmat);
-  Serial.println("ff");
-  printMatrix(&ansmat);
+  a = ansmat.data[0][0]*-1/2.0;
+  b = ansmat.data[1][0]*-1/2.0;
+  r = sqrt(a*a+b*b-ansmat.data[2][0]);
+  lcd.clear();
+  lcd.print(r);
   return EXIT_SUCCESS;
 }
 void setup() {
@@ -186,7 +182,7 @@ void setup() {
   } else {
     Serial.println("ToF ready");
   }
-
+  lcd.print("test"); 
   /*Lidar set up*/
   myLidarLite.begin(0, true);
   myLidarLite.configure(0);
@@ -196,15 +192,14 @@ void setup() {
   pinMode(STEP_PIN, OUTPUT);
   digitalWrite(DIR_PIN, HIGH);
   /*timer attch set up*/
-  MsTimer2::set(100, tick);/*[ms]*/
+  MsTimer2::set(200, tick);/*[ms]*/
   MsTimer2::start();
 }
+
 void loop() {
   if(flag==1){
-    if((LSM(x,y))==EXIT_SUCCESS){
-      Serial.println("ok");
-    }
-    flag==0;
+    flag=0;
+    LSM(x,y);
   }
 }
 int receive()
@@ -214,7 +209,7 @@ int receive()
   int rad_from_lidar = myLidarLite.distance(1);/*[mm]*/
   int rad_from_ToF   = measure.RangeMilliMeter;/*[mm]*/
   /*暫定的にlidarが1000mm以下の場合ToFの値をリターン*/
-  if (rad_from_lidar > 1000) {
+  if (rad_from_lidar > 200) {
     return rad_from_lidar;
   } else {
     return rad_from_ToF;
@@ -236,24 +231,11 @@ void tick()//タイマで割り込む
   digitalWrite(STEP_PIN, HIGH);
   delay(10);
   digitalWrite(STEP_PIN, LOW);
-  delay(10);
-  digitalWrite(STEP_PIN, HIGH);
-  delay(10);
-  digitalWrite(STEP_PIN, LOW);
-  delay(10);
-  digitalWrite(STEP_PIN, HIGH);
-  delay(10);
-  digitalWrite(STEP_PIN, LOW);
-  delay(10);
-  digitalWrite(STEP_PIN, HIGH);
-  delay(10);
-  digitalWrite(STEP_PIN, LOW);
   stepCount++;
   if (stepCount > NOS-1)
   {  
-      flag=1;
       MsTimer2::stop();
+      flag=1;
   }
 }
-
 
