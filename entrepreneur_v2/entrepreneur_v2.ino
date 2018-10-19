@@ -8,12 +8,22 @@
 #define STEP_PIN 3
 #define DEG2RAD pi/180.0
 #define NOS 400 //number of sample
+#define UP_PIN 18
+#define DOWN_PIN 14
+#define GO_PIN 15
+#define CW_PIN 44
+#define CCW_PIN 42
+#define PWM_PIN 8
+#define PWM_MD 255
 float x[NOS];
 float y[NOS];
-bool flag =01;
+bool flag =0,flag2 = 0;
 LIDARLite myLidarLite;
 Adafruit_VL53L0X ToF = Adafruit_VL53L0X();
 LiquidCrystal lcd(12,11,10,7,6,5,4);
+bool upState=0;
+bool downState=0;
+bool goState=0; 
 //構造体で行列を定義
 typedef struct matrix {
   int m;//行数
@@ -187,18 +197,48 @@ void setup() {
   myLidarLite.begin(0, true);
   myLidarLite.configure(0);
   Serial.println("lidar ready");
+  //sw setup
+  pinMode(UP_PIN,INPUT_PULLUP);
+  pinMode(DOWN_PIN,INPUT_PULLUP);
+  pinMode(GO_PIN,INPUT_PULLUP);
+  //motor setup 
+  pinMode(CW_PIN,OUTPUT);
+  pinMode(CCW_PIN,OUTPUT);
   //step motor set up
   pinMode(DIR_PIN, OUTPUT);
   pinMode(STEP_PIN, OUTPUT);
-  digitalWrite(DIR_PIN, HIGH);
   /*timer attch set up*/
-  MsTimer2::set(200, tick);/*[ms]*/
-  MsTimer2::start();
+  MsTimer2::set(250, tick);/*[ms]*/
 }
 
 void loop() {
+  upState = digitalRead(UP_PIN);
+  downState = digitalRead(DOWN_PIN);
+  goState = digitalRead(GO_PIN);
+  if ((upState == 0)&&(downState == 1)&&(flag2 == 0)) {
+    Serial.println("UP");     
+    digitalWrite(CW_PIN, HIGH);
+    digitalWrite(CCW_PIN,LOW);
+    digitalWrite(PWM_PIN,HIGH); 
+  } else if((upState == 1)&&(downState == 0)&&(flag2 == 0)){
+    Serial.println("DOWN");
+    digitalWrite(CW_PIN,LOW);
+    digitalWrite(CCW_PIN,HIGH);
+    digitalWrite(PWM_PIN,HIGH);
+  }else{
+    //Serial.println("stop");
+    digitalWrite(CW_PIN, LOW);
+    digitalWrite(CCW_PIN,LOW); 
+    digitalWrite(PWM_PIN,LOW);
+  } 
+  if (goState != 1){
+      Serial.println("GO");
+      MsTimer2::start();
+      flag2 = 1;
+  }
   if(flag==1){
     flag=0;
+    flag2=0;
     LSM(x,y);
   }
 }
@@ -209,7 +249,7 @@ int receive()
   int rad_from_lidar = myLidarLite.distance(1);/*[mm]*/
   int rad_from_ToF   = measure.RangeMilliMeter;/*[mm]*/
   /*暫定的にlidarが1000mm以下の場合ToFの値をリターン*/
-  if (rad_from_lidar > 200) {
+  if (rad_from_lidar > 1000) {
     return rad_from_lidar;
   } else {
     return rad_from_ToF;
@@ -221,13 +261,14 @@ void tick()//タイマで割り込む
   interrupts();
   int radius = receive();
   noInterrupts();
+  Serial.println(radius);
   x[stepCount] = radius*cos(stepCount*DEG2RAD);
   y[stepCount] = radius*sin(stepCount*DEG2RAD);
-  Serial.print(stepCount);
+  /*Serial.print(stepCount);
   Serial.print(",");
   Serial.print(x[stepCount]);
   Serial.print(",");
-  Serial.println(y[stepCount]);
+  Serial.println(y[stepCount]);*/
   digitalWrite(STEP_PIN, HIGH);
   delay(10);
   digitalWrite(STEP_PIN, LOW);
@@ -235,6 +276,7 @@ void tick()//タイマで割り込む
   if (stepCount > NOS-1)
   {  
       MsTimer2::stop();
+      stepCount = 0;
       flag=1;
   }
 }
