@@ -15,6 +15,8 @@
 #define CCW_PIN 42
 #define PWM_PIN 8
 #define PWM_MD 255
+#define tick_time 50
+
 float x[NOS];
 float y[NOS];
 bool flag =0,flag2 = 0;
@@ -187,20 +189,20 @@ int LSM(float *x, float *y)
 }
 void setup() {
   Serial.begin(115200);
-  Serial.println("setup");
+  Serial.println("#setup");
   lcd.print("setup"); 
   /*ToF set up*/
   if (!ToF.begin()) {
     Serial.println("Failed to boot VL53L0X");
     while(1);
   } else {
-    Serial.println("ToF ready");
+    Serial.println("#ToF ready");
   }
 
   /*Lidar set up*/
   myLidarLite.begin(0, true);
   myLidarLite.configure(0);
-  Serial.println("lidar ready");
+  Serial.println("#lidar ready");
   //sw setup
   pinMode(UP_PIN,INPUT_PULLUP);
   pinMode(DOWN_PIN,INPUT_PULLUP);
@@ -212,7 +214,7 @@ void setup() {
   pinMode(DIR_PIN, OUTPUT);
   pinMode(STEP_PIN, OUTPUT);
   /*timer attch set up*/
-  MsTimer2::set(50, tick);/*[ms]*/
+  MsTimer2::set(tick_time, tick);/*[ms]*/
 }
 
 void loop() {
@@ -220,12 +222,12 @@ void loop() {
   downState = digitalRead(DOWN_PIN);
   goState = digitalRead(GO_PIN);
   if ((upState == 0)&&(downState == 1)&&(flag2 == 0)) {
-    Serial.println("UP");     
+    //Serial.println("#UP");     
     digitalWrite(CW_PIN, HIGH);
     digitalWrite(CCW_PIN,LOW);
     digitalWrite(PWM_PIN,HIGH); 
   } else if((upState == 1)&&(downState == 0)&&(flag2 == 0)){
-    Serial.println("DOWN");
+    //Serial.println("#DOWN");
     digitalWrite(CW_PIN,LOW);
     digitalWrite(CCW_PIN,HIGH);
     digitalWrite(PWM_PIN,HIGH);
@@ -236,7 +238,7 @@ void loop() {
     digitalWrite(PWM_PIN,LOW);
   } 
   if ((goState != 1)&&(flag2==0)){
-      Serial.println("GO");
+      //Serial.println("#GO");
       MsTimer2::start();
       flag2 = 1;
   }
@@ -269,8 +271,8 @@ void tick()//タイマで割り込む
   interrupts();
   int radius = receive();
   noInterrupts();
-  x[stepCount] = radius*cos(stepCount*DEG2RAD);
-  y[stepCount] = radius*sin(stepCount*DEG2RAD);
+  x[stepCount] = radius*cos((360.0/200)*stepCount*DEG2RAD);
+  y[stepCount] = radius*sin((360.0/200)*stepCount*DEG2RAD);
   Serial.print(stepCount);
   Serial.print(",");
   Serial.print(x[stepCount]);

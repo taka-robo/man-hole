@@ -1,10 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-file = "3_900mm_1700mm"
+file = "600mm_706mm"
 csv = ".csv"
 png = ".png"
-data = np.loadtxt(file+csv, skiprows=4, delimiter=",")
+data = np.loadtxt(file+csv, skiprows=0, delimiter=",")
 print(data)
 x = data[:, 1]
 y = data[:, 2]
