@@ -15,7 +15,7 @@
 #define CCW_PIN 42
 #define PWM_PIN 8
 #define PWM_MD 255
-#define tick_time 50
+#define tick_time 50//50
 
 float x[NOS];
 float y[NOS];
@@ -279,6 +279,7 @@ void tick()//タイマで割り込む
   Serial.print(",");
   Serial.println(y[stepCount]);
   digitalWrite(STEP_PIN, HIGH);
+  //digitalWrite(STEP_PIN, LOW);
   delay(10);
   digitalWrite(STEP_PIN, LOW);
   stepCount++;
