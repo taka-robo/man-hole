@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-file = "point_data/11_08/600mm_handspin2"
+file = "point_data/11_12/900mm_160plusAshi"
 csv = ".csv"
 png = ".png"
 data = np.loadtxt(file+csv, skiprows=0, delimiter=",")

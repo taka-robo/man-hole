@@ -182,7 +182,7 @@ int LSM(float *x, float *y)
   b = ansmat.data[1][0]*-1/2.0;
   r = sqrt(a*a+b*b-ansmat.data[2][0]);
   lcd.clear();
-  lcd.print(r);
+  lcd.print(r*2);
   lcd.print("mm");
   Serial.println(r);
   return EXIT_SUCCESS;
