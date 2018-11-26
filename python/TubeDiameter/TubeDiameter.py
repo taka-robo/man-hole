@@ -3,7 +3,6 @@
 # import the necessary packages
 import cv2
 import numpy as np
-import serial
 import threading
 import json
 import sys
@@ -17,20 +16,20 @@ FRAME_H = 600
 FILE_DIST = 200
 FILE_DIST_COLOR = 100
 
+#ノイズの輪郭を制限する定数
+NOISE_MIN = 1e3
+NOISE_MAX = 1e5
+
 HSV_CONV = 0.70 #HSV, 360dankai => 256dankai , 250/360 = 0.7
 #colorRange = [[RedMin],[RedMax],[BlueMin],[BlueMax],[GreenMin],[GreenMax],[PurpleMin][PurpleMax],[YellowMin][YellowMax]]
 colorRange = [[30*HSV_CONV,330*HSV_CONV], [200*HSV_CONV,240*HSV_CONV], [80*HSV_CONV,150*HSV_CONV], [240*HSV_CONV,300*HSV_CONV],[40*HSV_CONV,80*HSV_CONV]]
-
-# 距離導出関数のマジックナンバー (係数,指数)
-COEFFICIENT_DF = 200198
-INDEX_DF = -0.808
 
 #コマンドライン引数の受け取りのため
 args = sys.argv
 #-----------------------------------------------------------------------------------
 # Loading still Image
 def loading_still_image():
-  image = cv2.imread('C:\\Users\\nct20\\Documents\\GitHub\\man-hole-Taka\\python\\TubeDiameter\\image_input\\'+str(FILE_DIST)+'mm.jpg')
+  image = cv2.imread('C:\\Users\\nct20\\Documents\\GitHub\\man-hole-Taka\\python\\TubeDiameter\\image_input\\100mm.jpg')
   #template = cv2.imread('C:\\Users\\nct20\\Documents\\GitHub\\man-hole-Taka\\python\\TubeDiameter\\image_input\\'+'color_sample_'+str(FILE_DIST_COLOR)+'mm.jpg')
   return image
 
@@ -42,7 +41,7 @@ def key_action(image):
   if k == 27:         # wait for ESC key to exit
     cv2.destroyAllWindows()
   elif k == ord('s'): # wait for 's' key to save and exit
-   cv2.imwrite('C:\\Users\\nct20\\Documents\\GitHub\\objectTracking\\image_output\\' + args[1] + '.jpg',image)
+   cv2.imwrite('C:\\Users\\nct20\\Documents\\GitHub\\man-hole-Taka\\python\\TubeDiameter\\image_output\\'+ 'test.jpg',image)
    cv2.destroyAllWindows()
 
   # 終了処理
@@ -89,8 +88,8 @@ def draw_rotation_rectangle(rects,image):
   box = np.int0(box)
 
   image = cv2.drawContours(image,[box],0,(0,0,255),2)
-  print ('w:' + str(rect[1][0]) + ',h:' + str(rect[1][1]))
-  print (str(COEFFICIENT_DF*((rect[1][0]*rect[1][1])**(INDEX_DF))))
+  #print ('w:' + str(rect[1][0]) + ',h:' + str(rect[1][1]))
+  #print (str(COEFFICIENT_DF*((rect[1][0]*rect[1][1])**(INDEX_DF))))
 
 
 # 指定した画像(path)の物体を検出し、外接矩形の画像を出力します
@@ -146,7 +145,7 @@ def detect_contour(src, blocksize, param1):
         cv2.destroyAllWindows()
     elif k == ord('s'):  # wait for 's' key to save and exit
         cv2.imwrite(
-            'C:\\Users\\nct20\\Documents\\GitHub\\objectTracking\\image_output\\200mm_test\\' + args[1] + '_' + str(
+            'C:\\Users\\nct20\\Documents\\GitHub\\man-hole-Taka\\python\\TubeDiameter\\image_output\\real_tube' + args[1] + '_' + str(
                 blocksize) + '_' + str(int(param1)) + '.jpg', approx)
         cv2.destroyAllWindows()
 
@@ -154,8 +153,9 @@ def detect_contour(src, blocksize, param1):
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
- for i in range(1, 11):
-  # Loading Still Image
+ print('Loading Image File now')
+ for i in range(1, 2):
+ # Loading Still Image
   image = loading_still_image()
 
   detect_contour(image, 11, float(i))
