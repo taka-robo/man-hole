@@ -41,7 +41,7 @@ def key_action(image):
   if k == 27:         # wait for ESC key to exit
     cv2.destroyAllWindows()
   elif k == ord('s'): # wait for 's' key to save and exit
-   cv2.imwrite('C:\\Users\\nct20\\Documents\\GitHub\\man-hole-Taka\\python\\TubeDiameter\\image_output\\'+ 'test.jpg',image)
+   cv2.imwrite('C:\\Users\\nct20\\Documents\\GitHub\\man-hole-Taka\\python\\TubeDiameter\\image_output\\'+ 'test1.jpg',image)
    cv2.destroyAllWindows()
 
   # 終了処理
@@ -94,6 +94,7 @@ def draw_rotation_rectangle(rects,image):
 
 # 指定した画像(path)の物体を検出し、外接矩形の画像を出力します
 def detect_contour(src, blocksize, param1):
+    print('Im in Detect Contour')
     # グレースケール画像へ変換
     gray = cv2.cvtColor(src, cv2.COLOR_BGR2GRAY)
 
@@ -110,12 +111,12 @@ def detect_contour(src, blocksize, param1):
     image, contours, hierarchy = cv2.findContours(th3, cv2.RETR_TREE,
                                                   cv2.CHAIN_APPROX_SIMPLE)  # ObjectTrackingは、findContours(mask, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
 
+    print('findContours')
     # 矩形検出された数（デフォルトで0を指定)
     detect_count = 0
 
     # 各輪郭に対する処理
     for i in range(0, len(contours)):
-
         # 輪郭の領域を計算
         area = cv2.contourArea(contours[i])
         epsilon = 0.1 * cv2.arcLength(contours[i], True)
@@ -137,7 +138,7 @@ def detect_contour(src, blocksize, param1):
             detect_count = detect_count + 1
 
     # 外接矩形された画像を表示
-    # cv2.imshow('output', src)
+    cv2.imshow('output', src)
 
     k = cv2.waitKey(0)
     # ESC:プログラム終了,s:セーブ＋プログラム終了
@@ -153,11 +154,14 @@ def detect_contour(src, blocksize, param1):
     cv2.destroyAllWindows()
 
 if __name__ == '__main__':
- print('Loading Image File now')
+ #print('Loading Image File now')
  for i in range(1, 2):
  # Loading Still Image
+  #print('Loading Image File now')
   image = loading_still_image()
-
+  print('Loaded Image File.')
+  image = cv2.flip(image, 1)
+  print('Flipede Image File.')
   detect_contour(image, 11, float(i))
 
   cv2.imshow('Recognition Now.', image)
